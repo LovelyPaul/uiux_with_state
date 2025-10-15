@@ -3,7 +3,7 @@
 
 # To specify which agents are active by default when --agents is not used,
 # uncomment and populate the following line. If omitted, all agents are active.
-default_agents = ["cursor", "codex"]
+default_agents = ["cursor", "claude", "codex"]
 
 # Enable nested rule loading from nested .ruler directories
 # When enabled, ruler will search for and process .ruler directories throughout the project hierarchy
@@ -38,3 +38,11 @@ default_agents = ["cursor", "codex"]
 # [mcp_servers.example_remote]
 # url = "https://api.example.com/mcp"
 # headers = { Authorization = "Bearer REPLACE_ME" }
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["chrome-devtools-mcp@latest"]
