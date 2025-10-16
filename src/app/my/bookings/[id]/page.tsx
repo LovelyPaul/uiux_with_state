@@ -246,10 +246,10 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
                     {format(new Date(booking.cancelledAt), 'yyyy.MM.dd HH:mm')}
                   </span>
                 </div>
-                {booking.cancelReason && (
+                {booking.cancellationReason && (
                   <div>
                     <span className="text-muted-foreground block mb-1">취소 사유</span>
-                    <p>{booking.cancelReason}</p>
+                    <p>{booking.cancellationReason}</p>
                   </div>
                 )}
               </div>
