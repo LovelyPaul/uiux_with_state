@@ -45,7 +45,7 @@ export async function createTempReservation(
   supabase: SupabaseClient,
   userId: string,
   seatId: string
-): Promise<HandlerResult<TempReservationResponse, SeatServiceError, unknown>> {
+): Promise<HandlerResult<{ tempReservationIds?: string[]; expiresAt?: string }, SeatServiceError, unknown>> {
   try {
     // Call Supabase RPC function for atomic transaction
     const { error } = await supabase.rpc('create_temp_reservation', {
@@ -61,7 +61,7 @@ export async function createTempReservation(
       return failure(500, seatErrorCodes.DATABASE_ERROR, error.message, { originalError: error });
     }
 
-    const result = success({ success: true });
+    const result = success({});
     console.log('[Service] Returning success result:', result);
     return result;
   } catch (error) {
@@ -74,7 +74,7 @@ export async function releaseTempReservation(
   supabase: SupabaseClient,
   userId: string,
   seatId: string
-): Promise<HandlerResult<TempReservationResponse, SeatServiceError, unknown>> {
+): Promise<HandlerResult<{ tempReservationIds?: string[]; expiresAt?: string }, SeatServiceError, unknown>> {
   try {
     // Delete temp reservation
     const { error: deleteError } = await supabase
@@ -97,7 +97,7 @@ export async function releaseTempReservation(
       return failure(500, seatErrorCodes.DATABASE_ERROR, updateError.message, { originalError: updateError });
     }
 
-    return success({ success: true });
+    return success({});
   } catch (error) {
     return failure(500, seatErrorCodes.DATABASE_ERROR, '임시 예약 해제 중 오류가 발생했습니다.', { error });
   }
