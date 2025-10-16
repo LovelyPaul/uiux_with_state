@@ -156,7 +156,7 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
                       locale: ko,
                     })}
                   </p>
-                  <p className="text-sm text-muted-foreground">{booking.startTime}</p>
+                  <p className="text-sm text-muted-foreground">{booking.concertTime}</p>
                 </div>
               </div>
 

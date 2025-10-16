@@ -138,7 +138,7 @@ export default function SeatsPage({ params }: SeatsPageProps) {
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">{concert.title}</h1>
         <p className="text-muted-foreground">
-          {selectedSchedule.concertDate} {selectedSchedule.startTime}
+          {selectedSchedule.concertDate} {selectedSchedule.concertTime}
         </p>
       </div>
 
