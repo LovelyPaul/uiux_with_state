@@ -1,0 +1,10 @@
+export const bookingErrorCodes = {
+  BOOKING_NOT_FOUND: 'BOOKING_NOT_FOUND',
+  ALREADY_CANCELLED: 'ALREADY_CANCELLED',
+  NOT_CANCELLABLE: 'NOT_CANCELLABLE',
+  NO_TEMP_RESERVATIONS: 'NO_TEMP_RESERVATIONS',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  DATABASE_ERROR: 'DATABASE_ERROR',
+} as const;
+
+export type BookingServiceError = keyof typeof bookingErrorCodes;
