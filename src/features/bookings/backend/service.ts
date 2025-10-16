@@ -11,6 +11,7 @@ import type {
   BookingItem,
   BookingDetail,
   CancelBookingResponse,
+  GuestBookingDetail,
 } from './schema';
 import {
   bookingErrorCodes,
@@ -309,6 +310,152 @@ export async function cancelBooking(
       }
       if (error.message.includes('BOOKING_NOT_FOUND')) {
         return failure(404, bookingErrorCodes.BOOKING_NOT_FOUND, '예약을 찾을 수 없습니다.');
+      }
+      return failure(500, bookingErrorCodes.DATABASE_ERROR, error.message, { originalError: error });
+    }
+
+    return success({ success: true });
+  } catch (error) {
+    return failure(500, bookingErrorCodes.DATABASE_ERROR, '예약 취소 중 오류가 발생했습니다.', { error });
+  }
+}
+
+export async function getGuestBookingDetail(
+  supabase: SupabaseClient,
+  phoneNumber: string,
+  password: string
+): Promise<HandlerResult<GuestBookingDetail, BookingServiceError, unknown>> {
+  try {
+    // Hash the password
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Query booking by phone and password
+    const { data: bookingData, error } = await supabase
+      .from('bookings')
+      .select(`
+        id,
+        booking_number,
+        status,
+        created_at,
+        cancelled_at,
+        cancellation_reason,
+        guest_name,
+        guest_phone,
+        concert_schedules!inner(
+          concert_date,
+          concert_time,
+          concerts!inner(title, poster_url, performers, venues!inner(name, address, location_lat, location_lng))
+        )
+      `)
+      .eq('guest_phone', phoneNumber)
+      .eq('guest_password_hash', passwordHash)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !bookingData) {
+      return failure(404, bookingErrorCodes.BOOKING_NOT_FOUND, '예약을 찾을 수 없거나 정보가 일치하지 않습니다.');
+    }
+
+    // Get seats
+    const { data: bookingSeats } = await supabase
+      .from('booking_seats')
+      .select('seats!inner(seat_number, seat_grade, price)')
+      .eq('booking_id', bookingData.id);
+
+    const concertDate = new Date(bookingData.concert_schedules.concert_date);
+    const now = new Date();
+    const isCancellable =
+      bookingData.status === 'confirmed' &&
+      concertDate > now &&
+      concertDate.getTime() - now.getTime() > 24 * 60 * 60 * 1000;
+
+    const guestBookingDetail: GuestBookingDetail = {
+      id: bookingData.id,
+      bookingNumber: bookingData.booking_number,
+      status: bookingData.status,
+      createdAt: bookingData.created_at,
+      cancelledAt: bookingData.cancelled_at,
+      cancellationReason: bookingData.cancellation_reason,
+      guestName: bookingData.guest_name,
+      guestPhone: bookingData.guest_phone,
+      concert: {
+        title: bookingData.concert_schedules.concerts.title,
+        posterUrl: bookingData.concert_schedules.concerts.poster_url,
+        performers: bookingData.concert_schedules.concerts.performers,
+      },
+      schedule: {
+        concertDate: bookingData.concert_schedules.concert_date,
+        concertTime: bookingData.concert_schedules.concert_time,
+      },
+      venue: {
+        name: bookingData.concert_schedules.concerts.venues.name,
+        address: bookingData.concert_schedules.concerts.venues.address,
+        locationLat: bookingData.concert_schedules.concerts.venues.location_lat,
+        locationLng: bookingData.concert_schedules.concerts.venues.location_lng,
+      },
+      seats: (bookingSeats || []).map((bs: any) => ({
+        seatNumber: bs.seats.seat_number,
+        seatGrade: bs.seats.seat_grade,
+        price: bs.seats.price,
+      })),
+      totalPrice: (bookingSeats || []).reduce((sum: number, bs: any) => sum + bs.seats.price, 0),
+      isCancellable,
+    };
+
+    return success(guestBookingDetail);
+  } catch (error) {
+    return failure(500, bookingErrorCodes.DATABASE_ERROR, '예약 조회 중 오류가 발생했습니다.', { error });
+  }
+}
+
+export async function cancelGuestBooking(
+  supabase: SupabaseClient,
+  phoneNumber: string,
+  password: string,
+  reason?: string,
+  reasonDetail?: string
+): Promise<HandlerResult<CancelBookingResponse, BookingServiceError, unknown>> {
+  try {
+    // Hash the password
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Find booking by phone and password
+    const { data: bookingData, error: findError } = await supabase
+      .from('bookings')
+      .select('id, user_id')
+      .eq('guest_phone', phoneNumber)
+      .eq('guest_password_hash', passwordHash)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (findError || !bookingData) {
+      return failure(404, bookingErrorCodes.BOOKING_NOT_FOUND, '예약을 찾을 수 없거나 정보가 일치하지 않습니다.');
+    }
+
+    // Call cancel booking transaction
+    const { error } = await supabase.rpc('cancel_booking_transaction', {
+      p_booking_id: bookingData.id,
+      p_user_id: bookingData.user_id,
+      p_reason: reason || null,
+      p_reason_detail: reasonDetail || null,
+    });
+
+    if (error) {
+      if (error.message.includes('ALREADY_CANCELLED')) {
+        return failure(409, bookingErrorCodes.ALREADY_CANCELLED, '이미 취소된 예약입니다.');
+      }
+      if (error.message.includes('NOT_CANCELLABLE')) {
+        return failure(400, bookingErrorCodes.NOT_CANCELLABLE, '취소 가능 기간이 지났습니다.');
       }
       return failure(500, bookingErrorCodes.DATABASE_ERROR, error.message, { originalError: error });
     }

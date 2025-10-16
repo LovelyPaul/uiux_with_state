@@ -118,3 +118,60 @@ export const CancelBookingResponseSchema = z.object({
 });
 
 export type CancelBookingResponse = z.infer<typeof CancelBookingResponseSchema>;
+
+// ===== Guest Booking Check =====
+
+export const GuestBookingCheckRequestSchema = z.object({
+  phoneNumber: z.string().regex(/^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/),
+  password: z.string().min(4),
+});
+
+export type GuestBookingCheckRequest = z.infer<typeof GuestBookingCheckRequestSchema>;
+
+export const GuestBookingDetailSchema = z.object({
+  id: z.string().uuid(),
+  bookingNumber: z.string(),
+  status: z.enum(['confirmed', 'cancelled']),
+  createdAt: z.string(),
+  cancelledAt: z.string().nullable(),
+  cancellationReason: z.string().nullable(),
+  guestName: z.string(),
+  guestPhone: z.string(),
+  concert: z.object({
+    title: z.string(),
+    posterUrl: z.string().nullable(),
+    performers: z.string().nullable(),
+  }),
+  schedule: z.object({
+    concertDate: z.string(),
+    concertTime: z.string(),
+  }),
+  venue: z.object({
+    name: z.string(),
+    address: z.string(),
+    locationLat: z.number().nullable(),
+    locationLng: z.number().nullable(),
+  }),
+  seats: z.array(
+    z.object({
+      seatNumber: z.string(),
+      seatGrade: z.string(),
+      price: z.number().int(),
+    })
+  ),
+  totalPrice: z.number().int(),
+  isCancellable: z.boolean(),
+});
+
+export type GuestBookingDetail = z.infer<typeof GuestBookingDetailSchema>;
+
+// ===== Guest Booking Cancel =====
+
+export const GuestBookingCancelRequestSchema = z.object({
+  phoneNumber: z.string().regex(/^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/),
+  password: z.string().min(4),
+  reason: z.string().optional(),
+  reasonDetail: z.string().max(500).optional(),
+});
+
+export type GuestBookingCancelRequest = z.infer<typeof GuestBookingCancelRequestSchema>;

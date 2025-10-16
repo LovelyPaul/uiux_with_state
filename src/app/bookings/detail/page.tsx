@@ -51,56 +51,71 @@ export default function BookingDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const bookingNumber = searchParams.get('bookingNumber');
   const phone = searchParams.get('phone');
   const password = searchParams.get('password');
 
   useEffect(() => {
-    if (!bookingNumber || !phone || !password) {
+    if (!phone || !password) {
       setError('예약 조회에 필요한 정보가 부족합니다.');
       setIsLoading(false);
       return;
     }
 
     fetchBookingDetail();
-  }, [bookingNumber, phone, password]);
+  }, [phone, password]);
 
   const fetchBookingDetail = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // TODO: API 호출하여 예약 조회
-      // 임시 데이터
-      setTimeout(() => {
-        setError('예약 조회 API가 아직 구현되지 않았습니다.');
-        setIsLoading(false);
-      }, 1000);
-    } catch (err) {
-      setError('예약 정보를 찾을 수 없거나 입력 정보가 올바르지 않습니다.');
+      const response = await apiClient.post('/api/bookings/guest/check', {
+        phoneNumber: phone,
+        password: password,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || '예약 조회 실패');
+      }
+
+      const data = await response.json();
+      setBooking(data);
+      setIsLoading(false);
+    } catch (err: any) {
+      setError(err.message || '예약 정보를 찾을 수 없거나 입력 정보가 올바르지 않습니다.');
       setIsLoading(false);
     }
   };
 
   const handleCancelBooking = async () => {
-    if (!booking) return;
+    if (!booking || !phone || !password) return;
 
     if (!confirm('정말로 예약을 취소하시겠습니까?')) {
       return;
     }
 
     try {
-      // TODO: 예약 취소 API 호출
+      const response = await apiClient.post('/api/bookings/guest/cancel', {
+        phoneNumber: phone,
+        password: password,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || '예약 취소 실패');
+      }
+
       toast({
         title: '예약 취소 완료',
         description: '예약이 성공적으로 취소되었습니다.',
       });
 
       fetchBookingDetail();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: '예약 취소 실패',
-        description: '예약 취소 중 오류가 발생했습니다.',
+        description: error.message || '예약 취소 중 오류가 발생했습니다.',
         variant: 'destructive',
       });
     }

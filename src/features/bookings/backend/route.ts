@@ -10,8 +10,17 @@ import {
   BookingListQuerySchema,
   BookingDetailParamsSchema,
   CancelBookingRequestSchema,
+  GuestBookingCheckRequestSchema,
+  GuestBookingCancelRequestSchema,
 } from './schema';
-import { createBooking, getBookingList, getBookingDetail, cancelBooking } from './service';
+import {
+  createBooking,
+  getBookingList,
+  getBookingDetail,
+  cancelBooking,
+  getGuestBookingDetail,
+  cancelGuestBooking,
+} from './service';
 import { bookingErrorCodes } from './error';
 
 export const registerBookingRoutes = (app: Hono<AppEnv>) => {
@@ -153,6 +162,50 @@ export const registerBookingRoutes = (app: Hono<AppEnv>) => {
     logger.info('Cancelling booking', { userId, bookingId, reason });
 
     const result = await cancelBooking(supabase, bookingId, userId, reason, reasonDetail);
+    return respond(c, result);
+  });
+
+  // POST /api/bookings/guest/check - 게스트 예약 조회 (핸드폰 번호 + 비밀번호)
+  app.post('/api/bookings/guest/check', async (c) => {
+    const logger = getLogger(c);
+    const supabase = getSupabase(c);
+
+    const bodyParseResult = GuestBookingCheckRequestSchema.safeParse(await c.req.json());
+
+    if (!bodyParseResult.success) {
+      logger.warn('Invalid guest booking check request', bodyParseResult.error);
+      return c.json(
+        { error: { code: 'INVALID_REQUEST', message: '잘못된 요청입니다.', details: bodyParseResult.error } },
+        400
+      );
+    }
+
+    const { phoneNumber, password } = bodyParseResult.data;
+    logger.info('Checking guest booking', { phoneNumber });
+
+    const result = await getGuestBookingDetail(supabase, phoneNumber, password);
+    return respond(c, result);
+  });
+
+  // POST /api/bookings/guest/cancel - 게스트 예약 취소 (핸드폰 번호 + 비밀번호)
+  app.post('/api/bookings/guest/cancel', async (c) => {
+    const logger = getLogger(c);
+    const supabase = getSupabase(c);
+
+    const bodyParseResult = GuestBookingCancelRequestSchema.safeParse(await c.req.json());
+
+    if (!bodyParseResult.success) {
+      logger.warn('Invalid guest booking cancel request', bodyParseResult.error);
+      return c.json(
+        { error: { code: 'INVALID_REQUEST', message: '잘못된 요청입니다.', details: bodyParseResult.error } },
+        400
+      );
+    }
+
+    const { phoneNumber, password, reason, reasonDetail } = bodyParseResult.data;
+    logger.info('Cancelling guest booking', { phoneNumber, reason });
+
+    const result = await cancelGuestBooking(supabase, phoneNumber, password, reason, reasonDetail);
     return respond(c, result);
   });
 };
