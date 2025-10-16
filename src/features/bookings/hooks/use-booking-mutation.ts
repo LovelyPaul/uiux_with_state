@@ -9,6 +9,9 @@ import type {
 
 interface CreateBookingParams {
   scheduleId: string;
+  name: string;
+  phoneNumber: string;
+  password: string;
 }
 
 interface CancelBookingParams {
@@ -29,6 +32,9 @@ export function useCreateBookingMutation() {
         '/api/bookings',
         {
           scheduleId: params.scheduleId,
+          name: params.name,
+          phoneNumber: params.phoneNumber,
+          password: params.password,
         }
       );
       return response.data;

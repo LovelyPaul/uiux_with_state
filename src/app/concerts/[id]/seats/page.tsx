@@ -4,14 +4,9 @@ import { use, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useConcertDetailQuery } from '@/features/concerts/hooks/use-concert-detail-query';
 import { useSeatsQuery } from '@/features/seats/hooks/use-seats-query';
-import {
-  useCreateTempReservationMutation,
-  useDeleteTempReservationMutation,
-} from '@/features/seats/hooks/use-temp-reservation-mutation';
-import { useCreateBookingMutation } from '@/features/bookings/hooks/use-booking-mutation';
+import { useCreateTempReservationMutation } from '@/features/seats/hooks/use-temp-reservation-mutation';
 import { useSeatStore } from '@/features/seats/stores/use-seat-store';
 import { SeatGrid } from '@/features/seats/components/seat-grid';
-import { SeatTimer } from '@/features/seats/components/seat-timer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,11 +34,8 @@ export default function SeatsPage({ params }: SeatsPageProps) {
 
   const {
     selectedSeats,
-    tempReservationIds,
-    expiresAt,
     addSeat,
     removeSeat,
-    clearSeats,
     getTotalPrice,
   } = useSeatStore();
 
@@ -54,8 +46,6 @@ export default function SeatsPage({ params }: SeatsPageProps) {
   );
 
   const createTempReservation = useCreateTempReservationMutation();
-  const deleteTempReservation = useDeleteTempReservationMutation();
-  const createBooking = useCreateBookingMutation();
 
   const selectedSchedule = concert?.schedules.find((s) => s.id === scheduleId);
 
@@ -101,10 +91,8 @@ export default function SeatsPage({ params }: SeatsPageProps) {
       });
       console.log('Temp reservation result:', result);
 
-      toast({
-        title: '좌석 임시 예약 완료',
-        description: '10분 안에 결제를 완료해주세요.',
-      });
+      // 임시 예약 성공 시 예약자 정보 입력 페이지로 이동
+      router.push(`/concerts/${concertId}/seats/booking?scheduleId=${scheduleId}`);
     } catch (error) {
       console.error('Temp reservation failed:', error);
       toast({
@@ -115,59 +103,6 @@ export default function SeatsPage({ params }: SeatsPageProps) {
     }
   };
 
-  const handleCancelTempReservation = async () => {
-    if (!tempReservationIds || tempReservationIds.length === 0) return;
-
-    try {
-      await deleteTempReservation.mutateAsync({
-        tempReservationIds,
-      });
-
-      clearSeats();
-
-      toast({
-        title: '임시 예약 취소',
-        description: '좌석 선택이 취소되었습니다.',
-      });
-    } catch (error) {
-      toast({
-        title: '취소 실패',
-        description: '오류가 발생했습니다.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handlePayment = async () => {
-    if (!scheduleId) return;
-
-    try {
-      const result = await createBooking.mutateAsync({ scheduleId });
-
-      toast({
-        title: '예약 완료',
-        description: `예약번호: ${result.bookingNumber}`,
-      });
-
-      clearSeats();
-      router.push('/my/bookings');
-    } catch (error) {
-      toast({
-        title: '예약 실패',
-        description: '결제 처리 중 오류가 발생했습니다.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleTimerExpire = () => {
-    toast({
-      title: '시간 만료',
-      description: '임시 예약 시간이 만료되었습니다. 다시 선택해주세요.',
-      variant: 'destructive',
-    });
-    clearSeats();
-  };
 
   const handleBackClick = () => {
     router.push(`/concerts/${concertId}`);
@@ -193,11 +128,6 @@ export default function SeatsPage({ params }: SeatsPageProps) {
     );
   }
 
-  const hasReservation = tempReservationIds && tempReservationIds.length > 0 && expiresAt;
-
-  // Debug: store 상태 로깅
-  console.log('Store state:', { tempReservationIds, expiresAt, hasReservation });
-
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <Button variant="ghost" onClick={handleBackClick} className="mb-4">
@@ -211,12 +141,6 @@ export default function SeatsPage({ params }: SeatsPageProps) {
           {selectedSchedule.concertDate} {selectedSchedule.startTime}
         </p>
       </div>
-
-      {hasReservation && expiresAt && (
-        <div className="mb-6 flex justify-center">
-          <SeatTimer expiresAt={expiresAt} onExpire={handleTimerExpire} />
-        </div>
-      )}
 
       <div className="grid lg:grid-cols-[1fr,320px] gap-8">
         <div>
@@ -258,41 +182,19 @@ export default function SeatsPage({ params }: SeatsPageProps) {
               </div>
 
               <div className="space-y-2">
-                {!hasReservation ? (
-                  <Button
-                    className="w-full"
-                    size="lg"
-                    onClick={handleTempReservation}
-                    disabled={
-                      selectedSeats.length === 0 ||
-                      createTempReservation.isPending
-                    }
-                  >
-                    {createTempReservation.isPending
-                      ? '처리 중...'
-                      : '좌석 예약하기'}
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      onClick={handlePayment}
-                      disabled={createBooking.isPending}
-                    >
-                      {createBooking.isPending ? '처리 중...' : '결제하기'}
-                    </Button>
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      size="lg"
-                      onClick={handleCancelTempReservation}
-                      disabled={deleteTempReservation.isPending}
-                    >
-                      취소
-                    </Button>
-                  </>
-                )}
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleTempReservation}
+                  disabled={
+                    selectedSeats.length === 0 ||
+                    createTempReservation.isPending
+                  }
+                >
+                  {createTempReservation.isPending
+                    ? '처리 중...'
+                    : '좌석 예약하기'}
+                </Button>
               </div>
 
               <p className="text-xs text-muted-foreground mt-4 text-center">

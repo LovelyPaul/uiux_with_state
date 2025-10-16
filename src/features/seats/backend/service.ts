@@ -54,14 +54,18 @@ export async function createTempReservation(
     });
 
     if (error) {
+      console.error('[Service] Supabase RPC error:', error);
       if (error.message.includes('SEAT_NOT_AVAILABLE')) {
         return failure(409, seatErrorCodes.SEAT_ALREADY_RESERVED, '이미 선택된 좌석입니다.');
       }
       return failure(500, seatErrorCodes.DATABASE_ERROR, error.message, { originalError: error });
     }
 
-    return success({ success: true });
+    const result = success({ success: true });
+    console.log('[Service] Returning success result:', result);
+    return result;
   } catch (error) {
+    console.error('[Service] Exception:', error);
     return failure(500, seatErrorCodes.DATABASE_ERROR, '임시 예약 생성 중 오류가 발생했습니다.', { error });
   }
 }

@@ -66,7 +66,9 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
 
     for (const seatId of seatIds) {
       const result = await createTempReservation(supabase, userId, seatId);
-      if (result.success) {
+      logger.info('[Route] Service returned:', { seatId, result });
+      if (result.ok) {
+        logger.info('[Route] Success, pushing seatId to array');
         tempReservationIds.push(seatId);
       } else {
         // 하나라도 실패하면 이미 생성된 것들 롤백
@@ -116,7 +118,7 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
     // 여러 좌석에 대해 임시 예약 해제
     for (const seatId of seatIds) {
       const result = await releaseTempReservation(supabase, userId, seatId);
-      if (!result.success) {
+      if (!result.ok) {
         logger.error('Failed to release temp reservation', { seatId, error: result.error });
         return respond(c, result);
       }
