@@ -79,7 +79,7 @@ export function BookingCard({ booking }: BookingCardProps) {
 
         <div className="flex items-center gap-2 text-sm">
           <MapPin className="h-4 w-4 text-muted-foreground" />
-          <span className="line-clamp-1">{booking.venue}</span>
+          <span className="line-clamp-1">{booking.venueName}</span>
         </div>
 
         <div className="flex items-center gap-2 text-sm">
