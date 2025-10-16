@@ -82,7 +82,7 @@ export default function BookingsPage() {
 
       {!isLoading && data && (
         <>
-          {data.items.length === 0 ? (
+          {data.bookings.length === 0 ? (
             <EmptyState
               icon={Ticket}
               title="예약 내역이 없습니다"
@@ -93,16 +93,16 @@ export default function BookingsPage() {
           ) : (
             <>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {data.items.map((booking) => (
+                {data.bookings.map((booking) => (
                   <BookingCard key={booking.id} booking={booking} />
                 ))}
               </div>
 
-              {data.pagination.totalPages > 1 && (
+              {data.total > data.limit && (
                 <div className="mt-8">
                   <Pagination
-                    currentPage={data.pagination.currentPage}
-                    totalPages={data.pagination.totalPages}
+                    currentPage={data.page}
+                    totalPages={Math.ceil(data.total / data.limit)}
                     onPageChange={handlePageChange}
                   />
                 </div>
