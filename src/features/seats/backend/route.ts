@@ -72,7 +72,7 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
         tempReservationIds.push(seatId);
       } else {
         // 하나라도 실패하면 이미 생성된 것들 롤백
-        logger.error('Failed to create temp reservation', { seatId, error: result.error });
+        logger.error('Failed to create temp reservation', { seatId, error: (result as any).error });
         return respond(c, result);
       }
     }
