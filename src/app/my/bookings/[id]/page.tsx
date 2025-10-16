@@ -89,27 +89,37 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
     );
   }
 
+  const getDDay = () => {
+    const concertDate = new Date(booking.schedule.concertDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    concertDate.setHours(0, 0, 0, 0);
+
+    const diffTime = concertDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  };
+
   const getDDayText = () => {
     if (booking.status === 'cancelled') {
       return null;
     }
 
-    if (booking.dDay === null) {
-      return null;
-    }
+    const dDay = getDDay();
 
-    if (booking.dDay === 0) {
+    if (dDay === 0) {
       return '오늘';
     }
 
-    if (booking.dDay > 0) {
-      return `D-${booking.dDay}`;
+    if (dDay > 0) {
+      return `D-${dDay}`;
     }
 
     return '공연 종료';
   };
 
-  const canCancel = booking.status === 'confirmed' && booking.dDay !== null && booking.dDay > 0;
+  const canCancel = booking.status === 'confirmed' && getDDay() > 0;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-3xl">
@@ -122,12 +132,12 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-2">{booking.concertTitle}</h1>
+              <h1 className="text-2xl font-bold mb-2">{booking.concert.title}</h1>
               <p className="text-muted-foreground">예약번호: {booking.bookingNumber}</p>
             </div>
             <div className="flex flex-col gap-2 items-end">
               {getDDayText() && (
-                <Badge variant={booking.dDay === 0 ? 'destructive' : 'default'}>
+                <Badge variant={getDDay() === 0 ? 'destructive' : 'default'}>
                   {getDDayText()}
                 </Badge>
               )}
@@ -152,19 +162,19 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
                 <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">
-                    {format(new Date(booking.concertDate), 'yyyy년 MM월 dd일 (E)', {
+                    {format(new Date(booking.schedule.concertDate), 'yyyy년 MM월 dd일 (E)', {
                       locale: ko,
                     })}
                   </p>
-                  <p className="text-sm text-muted-foreground">{booking.concertTime}</p>
+                  <p className="text-sm text-muted-foreground">{booking.schedule.concertTime}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium">{booking.venue}</p>
-                  <p className="text-sm text-muted-foreground">{booking.location}</p>
+                  <p className="font-medium">{booking.venue.name}</p>
+                  <p className="text-sm text-muted-foreground">{booking.venue.address}</p>
                 </div>
               </div>
             </div>
