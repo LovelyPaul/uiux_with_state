@@ -87,7 +87,7 @@ export default function ConcertDetailPage({ params }: ConcertDetailPageProps) {
       <div className="mb-8">
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted mb-6">
           <img
-            src={concert.imageUrl || `https://picsum.photos/seed/${concert.id}/1200/675`}
+            src={concert.posterUrl || `https://picsum.photos/seed/${concert.id}/1200/675`}
             alt={concert.title}
             className="object-cover w-full h-full"
           />
@@ -96,7 +96,9 @@ export default function ConcertDetailPage({ params }: ConcertDetailPageProps) {
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">{concert.title}</h1>
-            <p className="text-lg text-muted-foreground">{concert.artist}</p>
+            {concert.performers && (
+              <p className="text-lg text-muted-foreground">{concert.performers}</p>
+            )}
           </div>
 
           <Button
@@ -116,11 +118,9 @@ export default function ConcertDetailPage({ params }: ConcertDetailPageProps) {
 
         <div className="flex flex-wrap gap-3 mb-6">
           {concert.genre && <Badge variant="outline">{concert.genre}</Badge>}
-          {concert.availableSeats <= 10 && concert.availableSeats > 0 && (
-            <Badge variant="destructive">마감임박</Badge>
-          )}
-          {concert.availableSeats === 0 && (
-            <Badge variant="secondary">매진</Badge>
+          {concert.rating && <Badge variant="outline">{concert.rating}</Badge>}
+          {concert.runningTime && (
+            <Badge variant="outline">{concert.runningTime}분</Badge>
           )}
         </div>
 
@@ -128,23 +128,19 @@ export default function ConcertDetailPage({ params }: ConcertDetailPageProps) {
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="font-medium">{concert.venue}</p>
-              <p className="text-sm text-muted-foreground">{concert.location}</p>
+              <p className="font-medium">{concert.venue.name}</p>
+              <p className="text-sm text-muted-foreground">{concert.venue.address}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-muted-foreground" />
-            <p>
-              {format(new Date(concert.startDate), 'yyyy년 MM월 dd일', {
-                locale: ko,
-              })}
-              {concert.startDate !== concert.endDate &&
-                ` - ${format(new Date(concert.endDate), 'yyyy년 MM월 dd일', {
-                  locale: ko,
-                })}`}
-            </p>
-          </div>
+          {concert.schedules.length > 0 && (
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <p>
+                {concert.schedules.length}개의 공연 일정이 있습니다
+              </p>
+            </div>
+          )}
         </div>
 
         {concert.description && (

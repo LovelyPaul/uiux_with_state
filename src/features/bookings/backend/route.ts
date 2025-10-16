@@ -20,13 +20,19 @@ export const registerBookingRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
     const supabase = getSupabase(c);
 
-    const userId = c.get('userId');
+    // 로그인하지 않은 경우 세션 ID 사용 (게스트 예약 지원)
+    let userId = c.get('userId');
 
     if (!userId) {
-      return c.json(
-        { error: { code: bookingErrorCodes.UNAUTHORIZED, message: '로그인이 필요합니다.' } },
-        401
-      );
+      const sessionId = c.req.header('X-Session-Id');
+      if (!sessionId) {
+        return c.json(
+          { error: { code: 'INVALID_REQUEST', message: '세션 정보가 없습니다.' } },
+          400
+        );
+      }
+      userId = `guest_${sessionId}`;
+      logger.info('Using guest session for booking', { sessionId });
     }
 
     const bodyParseResult = CreateBookingRequestSchema.safeParse(await c.req.json());

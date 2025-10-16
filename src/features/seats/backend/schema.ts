@@ -25,19 +25,20 @@ export const SeatsResponseSchema = z.object({
 export type SeatsResponse = z.infer<typeof SeatsResponseSchema>;
 
 export const TempReservationRequestSchema = z.object({
-  seatId: z.string().uuid(),
+  seatIds: z.array(z.string().uuid()).min(1),
 });
 
 export type TempReservationRequest = z.infer<typeof TempReservationRequestSchema>;
 
 export const TempReservationResponseSchema = z.object({
-  success: z.boolean(),
+  tempReservationIds: z.array(z.string().uuid()),
+  expiresAt: z.string(),
 });
 
 export type TempReservationResponse = z.infer<typeof TempReservationResponseSchema>;
 
 export const ReleaseTempReservationRequestSchema = z.object({
-  seatId: z.string().uuid(),
+  seatIds: z.array(z.string().uuid()).min(1),
 });
 
 export type ReleaseTempReservationRequest = z.infer<typeof ReleaseTempReservationRequestSchema>;

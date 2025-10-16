@@ -37,13 +37,14 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
     const supabase = getSupabase(c);
 
-    const userId = c.get('userId');
+    // 로그인하지 않은 경우 세션 ID 사용 (게스트 예약 지원)
+    let userId = c.get('userId');
 
     if (!userId) {
-      return c.json(
-        { error: { code: seatErrorCodes.UNAUTHORIZED, message: '로그인이 필요합니다.' } },
-        401
-      );
+      // 세션 ID를 헤더에서 가져오거나 생성
+      const sessionId = c.req.header('X-Session-Id') || crypto.randomUUID();
+      userId = `guest_${sessionId}`;
+      logger.info('Using guest session for temp reservation', { sessionId });
     }
 
     const bodyParseResult = TempReservationRequestSchema.safeParse(await c.req.json());
@@ -56,11 +57,27 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
       );
     }
 
-    const { seatId } = bodyParseResult.data;
-    logger.info('Creating temp reservation', { userId, seatId });
+    const { seatIds } = bodyParseResult.data;
+    logger.info('Creating temp reservations', { userId, seatIds });
 
-    const result = await createTempReservation(supabase, userId, seatId);
-    return respond(c, result);
+    // 여러 좌석에 대해 임시 예약 생성
+    const tempReservationIds: string[] = [];
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10분 후
+
+    for (const seatId of seatIds) {
+      const result = await createTempReservation(supabase, userId, seatId);
+      if (result.success) {
+        tempReservationIds.push(seatId);
+      } else {
+        // 하나라도 실패하면 이미 생성된 것들 롤백
+        logger.error('Failed to create temp reservation', { seatId, error: result.error });
+        return respond(c, result);
+      }
+    }
+
+    const response = { tempReservationIds, expiresAt };
+    logger.info('Returning temp reservation response:', response);
+    return c.json(response, 200);
   });
 
   // DELETE /api/temp-reservations - 임시 예약 해제
@@ -68,13 +85,19 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
     const logger = getLogger(c);
     const supabase = getSupabase(c);
 
-    const userId = c.get('userId');
+    // 로그인하지 않은 경우 세션 ID 사용 (게스트 예약 지원)
+    let userId = c.get('userId');
 
     if (!userId) {
-      return c.json(
-        { error: { code: seatErrorCodes.UNAUTHORIZED, message: '로그인이 필요합니다.' } },
-        401
-      );
+      const sessionId = c.req.header('X-Session-Id');
+      if (!sessionId) {
+        return c.json(
+          { error: { code: 'INVALID_REQUEST', message: '세션 정보가 없습니다.' } },
+          400
+        );
+      }
+      userId = `guest_${sessionId}`;
+      logger.info('Using guest session for release', { sessionId });
     }
 
     const bodyParseResult = ReleaseTempReservationRequestSchema.safeParse(await c.req.json());
@@ -87,10 +110,18 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
       );
     }
 
-    const { seatId } = bodyParseResult.data;
-    logger.info('Releasing temp reservation', { userId, seatId });
+    const { seatIds } = bodyParseResult.data;
+    logger.info('Releasing temp reservations', { userId, seatIds });
 
-    const result = await releaseTempReservation(supabase, userId, seatId);
-    return respond(c, result);
+    // 여러 좌석에 대해 임시 예약 해제
+    for (const seatId of seatIds) {
+      const result = await releaseTempReservation(supabase, userId, seatId);
+      if (!result.success) {
+        logger.error('Failed to release temp reservation', { seatId, error: result.error });
+        return respond(c, result);
+      }
+    }
+
+    return c.json({ success: true }, 200);
   });
 };

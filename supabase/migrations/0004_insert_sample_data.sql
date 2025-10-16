@@ -20,7 +20,7 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO concerts (id, venue_id, title, poster_url, description, genre, performers, rating, running_time, status, popularity) VALUES
   (
-    'c0000001-0000-0000-0000-000000000001',
+    '10000001-0000-0000-0000-000000000001',
     '11111111-1111-1111-1111-111111111111',
     '2024 Rock Festival Seoul',
     'https://picsum.photos/seed/rock1/800/600',
@@ -33,7 +33,7 @@ INSERT INTO concerts (id, venue_id, title, poster_url, description, genre, perfo
     1250
   ),
   (
-    'c0000002-0000-0000-0000-000000000002',
+    '10000002-0000-0000-0000-000000000002',
     '22222222-2222-2222-2222-222222222222',
     'K-POP 슈퍼콘서트 2024',
     'https://picsum.photos/seed/kpop1/800/600',
@@ -46,7 +46,7 @@ INSERT INTO concerts (id, venue_id, title, poster_url, description, genre, perfo
     2300
   ),
   (
-    'c0000003-0000-0000-0000-000000000003',
+    '10000003-0000-0000-0000-000000000003',
     '33333333-3333-3333-3333-333333333333',
     'Jazz Night in Seoul',
     'https://picsum.photos/seed/jazz1/800/600',
@@ -59,7 +59,7 @@ INSERT INTO concerts (id, venue_id, title, poster_url, description, genre, perfo
     850
   ),
   (
-    'c0000004-0000-0000-0000-000000000004',
+    '10000004-0000-0000-0000-000000000004',
     '44444444-4444-4444-4444-444444444444',
     '힙합 레전드 컴백 콘서트',
     'https://picsum.photos/seed/hiphop1/800/600',
@@ -72,7 +72,7 @@ INSERT INTO concerts (id, venue_id, title, poster_url, description, genre, perfo
     1650
   ),
   (
-    'c0000005-0000-0000-0000-000000000005',
+    '10000005-0000-0000-0000-000000000005',
     '55555555-5555-5555-5555-555555555555',
     '클래식 갈라 콘서트',
     'https://picsum.photos/seed/classical1/800/600',
@@ -85,7 +85,7 @@ INSERT INTO concerts (id, venue_id, title, poster_url, description, genre, perfo
     720
   ),
   (
-    'c0000006-0000-0000-0000-000000000006',
+    '10000006-0000-0000-0000-000000000006',
     '11111111-1111-1111-1111-111111111111',
     'EDM Festival Korea 2024',
     'https://picsum.photos/seed/edm1/800/600',
@@ -105,36 +105,36 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Rock Festival (3일간)
 INSERT INTO concert_schedules (id, concert_id, concert_date, concert_time, total_seats, available_seats, is_sold_out, is_booking_open) VALUES
-  ('s0000001-0000-0000-0000-000000000001', 'c0000001-0000-0000-0000-000000000001', '2025-11-15', '19:00:00', 5000, 3200, false, true),
-  ('s0000002-0000-0000-0000-000000000002', 'c0000001-0000-0000-0000-000000000001', '2025-11-16', '19:00:00', 5000, 2800, false, true),
-  ('s0000003-0000-0000-0000-000000000003', 'c0000001-0000-0000-0000-000000000001', '2025-11-17', '19:00:00', 5000, 1200, false, true)
+  ('20000001-0000-0000-0000-000000000001', '10000001-0000-0000-0000-000000000001', '2025-11-15', '19:00:00', 5000, 3200, false, true),
+  ('20000002-0000-0000-0000-000000000002', '10000001-0000-0000-0000-000000000001', '2025-11-16', '19:00:00', 5000, 2800, false, true),
+  ('20000003-0000-0000-0000-000000000003', '10000001-0000-0000-0000-000000000001', '2025-11-17', '19:00:00', 5000, 1200, false, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- K-POP 슈퍼콘서트 (2일간)
 INSERT INTO concert_schedules (id, concert_id, concert_date, concert_time, total_seats, available_seats, is_sold_out, is_booking_open) VALUES
-  ('s0000004-0000-0000-0000-000000000004', 'c0000002-0000-0000-0000-000000000002', '2025-12-20', '18:00:00', 8000, 0, true, false),
-  ('s0000005-0000-0000-0000-000000000005', 'c0000002-0000-0000-0000-000000000002', '2025-12-21', '18:00:00', 8000, 150, false, true)
+  ('20000004-0000-0000-0000-000000000004', '10000002-0000-0000-0000-000000000002', '2025-12-20', '18:00:00', 8000, 0, true, false),
+  ('20000005-0000-0000-0000-000000000005', '10000002-0000-0000-0000-000000000002', '2025-12-21', '18:00:00', 8000, 150, false, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Jazz Night
 INSERT INTO concert_schedules (id, concert_id, concert_date, concert_time, total_seats, available_seats, is_sold_out, is_booking_open) VALUES
-  ('s0000006-0000-0000-0000-000000000006', 'c0000003-0000-0000-0000-000000000003', '2025-11-30', '19:30:00', 2000, 1450, false, true)
+  ('20000006-0000-0000-0000-000000000006', '10000003-0000-0000-0000-000000000003', '2025-11-30', '19:30:00', 2000, 1450, false, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 힙합 레전드
 INSERT INTO concert_schedules (id, concert_id, concert_date, concert_time, total_seats, available_seats, is_sold_out, is_booking_open) VALUES
-  ('s0000007-0000-0000-0000-000000000007', 'c0000004-0000-0000-0000-000000000004', '2025-12-05', '19:00:00', 6000, 4200, false, true),
-  ('s0000008-0000-0000-0000-000000000008', 'c0000004-0000-0000-0000-000000000004', '2025-12-06', '19:00:00', 6000, 3800, false, true)
+  ('20000007-0000-0000-0000-000000000007', '10000004-0000-0000-0000-000000000004', '2025-12-05', '19:00:00', 6000, 4200, false, true),
+  ('20000008-0000-0000-0000-000000000008', '10000004-0000-0000-0000-000000000004', '2025-12-06', '19:00:00', 6000, 3800, false, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 클래식 갈라
 INSERT INTO concert_schedules (id, concert_id, concert_date, concert_time, total_seats, available_seats, is_sold_out, is_booking_open) VALUES
-  ('s0000009-0000-0000-0000-000000000009', 'c0000005-0000-0000-0000-000000000005', '2025-11-25', '19:30:00', 3000, 2100, false, true)
+  ('20000009-0000-0000-0000-000000000009', '10000005-0000-0000-0000-000000000005', '2025-11-25', '19:30:00', 3000, 2100, false, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- EDM Festival
 INSERT INTO concert_schedules (id, concert_id, concert_date, concert_time, total_seats, available_seats, is_sold_out, is_booking_open) VALUES
-  ('s0000010-0000-0000-0000-000000000010', 'c0000006-0000-0000-0000-000000000006', '2025-12-31', '20:00:00', 10000, 5500, false, true)
+  ('20000010-0000-0000-0000-000000000010', '10000006-0000-0000-0000-000000000006', '2025-12-31', '20:00:00', 10000, 5500, false, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================
@@ -142,17 +142,17 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================
 
 -- 각 일정별로 좌석 생성 (VIP, R석, S석, A석)
--- Rock Festival - 첫째날 (s0000001)
+-- Rock Festival - 첫째날 (20000001)
 DO $$
 DECLARE
-  schedule_id UUID := 's0000001-0000-0000-0000-000000000001';
+  schedule_id UUID := '20000001-0000-0000-0000-000000000001';
   seat_num TEXT;
   i INTEGER;
 BEGIN
   -- VIP석 (1-100번): 150,000원
   FOR i IN 1..100 LOOP
     seat_num := 'VIP-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'VIP', 150000, i % 10, i / 10,
             CASE WHEN i <= 68 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -161,7 +161,7 @@ BEGIN
   -- R석 (1-200번): 120,000원
   FOR i IN 1..200 LOOP
     seat_num := 'R-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'R석', 120000, i % 20, i / 20 + 10,
             CASE WHEN i <= 120 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -170,7 +170,7 @@ BEGIN
   -- S석 (1-300번): 90,000원
   FOR i IN 1..300 LOOP
     seat_num := 'S-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'S석', 90000, i % 30, i / 30 + 20,
             CASE WHEN i <= 180 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -179,23 +179,23 @@ BEGIN
   -- A석 (1-400번): 60,000원
   FOR i IN 1..400 LOOP
     seat_num := 'A-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'A석', 60000, i % 40, i / 40 + 30, 'available')
     ON CONFLICT DO NOTHING;
   END LOOP;
 END $$;
 
--- K-POP 슈퍼콘서트 - 둘째날 (s0000005) - 마감 임박
+-- K-POP 슈퍼콘서트 - 둘째날 (20000005) - 마감 임박
 DO $$
 DECLARE
-  schedule_id UUID := 's0000005-0000-0000-0000-000000000005';
+  schedule_id UUID := '20000005-0000-0000-0000-000000000005';
   seat_num TEXT;
   i INTEGER;
 BEGIN
   -- VIP석: 200,000원 (전석 매진)
   FOR i IN 1..150 LOOP
     seat_num := 'VIP-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'VIP', 200000, i % 15, i / 15, 'reserved')
     ON CONFLICT DO NOTHING;
   END LOOP;
@@ -203,7 +203,7 @@ BEGIN
   -- R석: 150,000원 (잔여 150석)
   FOR i IN 1..300 LOOP
     seat_num := 'R-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'R석', 150000, i % 30, i / 30 + 15,
             CASE WHEN i <= 150 THEN 'available' ELSE 'reserved' END)
     ON CONFLICT DO NOTHING;
@@ -212,22 +212,22 @@ BEGIN
   -- S석과 A석은 매진
   FOR i IN 1..500 LOOP
     seat_num := 'S-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'S석', 110000, i % 50, i / 50 + 30, 'reserved')
     ON CONFLICT DO NOTHING;
   END LOOP;
 END $$;
 
--- Jazz Night (s0000006)
+-- Jazz Night (20000006)
 DO $$
 DECLARE
-  schedule_id UUID := 's0000006-0000-0000-0000-000000000006';
+  schedule_id UUID := '20000006-0000-0000-0000-000000000006';
   seat_num TEXT;
   i INTEGER;
 BEGIN
   FOR i IN 1..50 LOOP
     seat_num := 'VIP-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'VIP', 100000, i % 10, i / 10,
             CASE WHEN i <= 28 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -235,7 +235,7 @@ BEGIN
 
   FOR i IN 1..150 LOOP
     seat_num := 'R-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'R석', 70000, i % 15, i / 15 + 5,
             CASE WHEN i <= 65 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -243,22 +243,22 @@ BEGIN
 
   FOR i IN 1..200 LOOP
     seat_num := 'S-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'S석', 50000, i % 20, i / 20 + 15, 'available')
     ON CONFLICT DO NOTHING;
   END LOOP;
 END $$;
 
--- 힙합 레전드 - 첫째날 (s0000007)
+-- 힙합 레전드 - 첫째날 (20000007)
 DO $$
 DECLARE
-  schedule_id UUID := 's0000007-0000-0000-0000-000000000007';
+  schedule_id UUID := '20000007-0000-0000-0000-000000000007';
   seat_num TEXT;
   i INTEGER;
 BEGIN
   FOR i IN 1..100 LOOP
     seat_num := 'VIP-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'VIP', 180000, i % 10, i / 10,
             CASE WHEN i <= 30 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -266,23 +266,23 @@ BEGIN
 
   FOR i IN 1..300 LOOP
     seat_num := 'R-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'R석', 130000, i % 30, i / 30 + 10, 'available')
     ON CONFLICT DO NOTHING;
   END LOOP;
 END $$;
 
--- EDM Festival (s0000010)
+-- EDM Festival (20000010)
 DO $$
 DECLARE
-  schedule_id UUID := 's0000010-0000-0000-0000-000000000010';
+  schedule_id UUID := '20000010-0000-0000-0000-000000000010';
   seat_num TEXT;
   i INTEGER;
 BEGIN
   -- 스탠딩 A구역
   FOR i IN 1..200 LOOP
     seat_num := 'STANDING-A-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'Standing A', 150000, i % 20, i / 20,
             CASE WHEN i <= 110 THEN 'reserved' ELSE 'available' END)
     ON CONFLICT DO NOTHING;
@@ -291,7 +291,7 @@ BEGIN
   -- 스탠딩 B구역
   FOR i IN 1..300 LOOP
     seat_num := 'STANDING-B-' || LPAD(i::TEXT, 3, '0');
-    INSERT INTO seats (schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
+    INSERT INTO seats (concert_schedule_id, seat_number, seat_grade, price, position_x, position_y, status)
     VALUES (schedule_id, seat_num, 'Standing B', 120000, i % 30, i / 30 + 10, 'available')
     ON CONFLICT DO NOTHING;
   END LOOP;

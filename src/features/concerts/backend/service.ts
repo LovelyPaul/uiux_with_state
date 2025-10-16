@@ -103,23 +103,25 @@ export async function getConcertList(
 
     const { data: schedules } = await supabase
       .from('concert_schedules')
-      .select('concert_id, concert_date')
+      .select('id, concert_id, concert_date')
       .in('concert_id', concertIds)
       .eq('is_booking_open', true)
       .eq('is_sold_out', false)
       .order('concert_date', { ascending: true });
 
+    const scheduleIds = schedules?.map(s => s.id) || [];
     const { data: seats } = await supabase
       .from('seats')
       .select('concert_schedule_id, price, status')
-      .in('concert_schedule_id', schedules?.map(s => s.concert_id) || []);
+      .in('concert_schedule_id', scheduleIds);
 
     const concerts: ConcertItem[] = data.map((row: any) => {
       const concertSchedules = schedules?.filter(s => s.concert_id === row.id) || [];
       const nearestDate = concertSchedules[0]?.concert_date || null;
 
+      const concertScheduleIds = concertSchedules.map(cs => cs.id);
       const concertSeats = seats?.filter(s =>
-        concertSchedules.some(cs => cs.concert_id === s.concert_schedule_id)
+        concertScheduleIds.includes(s.concert_schedule_id)
       ) || [];
 
       const availableSeatsCount = concertSeats.filter(s => s.status === 'available').length;

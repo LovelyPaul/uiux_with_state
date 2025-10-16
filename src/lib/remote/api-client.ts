@@ -1,10 +1,35 @@
 import axios, { isAxiosError } from "axios";
 
+// 게스트 세션 ID 관리
+const SESSION_STORAGE_KEY = 'guest_session_id';
+
+const getOrCreateSessionId = (): string => {
+  if (typeof window === 'undefined') return '';
+
+  let sessionId = sessionStorage.getItem(SESSION_STORAGE_KEY);
+
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+  }
+
+  return sessionId;
+};
+
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// 모든 요청에 세션 ID 헤더 추가
+apiClient.interceptors.request.use((config) => {
+  const sessionId = getOrCreateSessionId();
+  if (sessionId) {
+    config.headers['X-Session-Id'] = sessionId;
+  }
+  return config;
 });
 
 type ErrorPayload = {

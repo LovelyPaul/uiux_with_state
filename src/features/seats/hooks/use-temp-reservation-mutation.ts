@@ -31,11 +31,16 @@ export function useCreateTempReservationMutation() {
       return response.data;
     },
     onSuccess: (data) => {
+      console.log('Temp reservation created:', data);
+
       // 임시 예약 정보를 store에 저장
       setTempReservations(data.tempReservationIds, data.expiresAt);
 
       // 좌석 목록 쿼리 무효화 (상태 변경 반영)
       queryClient.invalidateQueries({ queryKey: ['seats'] });
+    },
+    onError: (error) => {
+      console.error('Temp reservation error:', error);
     },
   });
 }
@@ -49,9 +54,13 @@ export function useDeleteTempReservationMutation() {
 
   return useMutation({
     mutationFn: async (params: DeleteTempReservationParams) => {
-      const idsParam = params.tempReservationIds.join(',');
       const response = await apiClient.delete<{ success: boolean }>(
-        `/api/temp-reservations?ids=${idsParam}`
+        '/api/temp-reservations',
+        {
+          data: {
+            seatIds: params.tempReservationIds,
+          },
+        }
       );
       return response.data;
     },

@@ -11,9 +11,10 @@ import { useRouter } from 'next/navigation';
 interface Schedule {
   id: string;
   concertDate: string;
-  startTime: string;
+  concertTime: string;
   availableSeats: number;
-  totalSeats: number;
+  isSoldOut: boolean;
+  isBookingOpen: boolean;
 }
 
 interface ConcertScheduleListProps {
@@ -47,10 +48,7 @@ export function ConcertScheduleList({
   return (
     <div className="space-y-3">
       {schedules.map((schedule) => {
-        const availabilityPercent =
-          (schedule.availableSeats / schedule.totalSeats) * 100;
-        const isSoldOut = schedule.availableSeats === 0;
-        const isAlmostSoldOut = availabilityPercent <= 10 && !isSoldOut;
+        const isAlmostSoldOut = schedule.availableSeats <= 10 && schedule.availableSeats > 0;
 
         return (
           <Card key={schedule.id}>
@@ -68,28 +66,30 @@ export function ConcertScheduleList({
 
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
-                    <span>{schedule.startTime}</span>
+                    <span>{schedule.concertTime}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    잔여 좌석: {schedule.availableSeats.toLocaleString()} /{' '}
-                    {schedule.totalSeats.toLocaleString()}
+                    잔여 좌석: {schedule.availableSeats.toLocaleString()}석
                   </span>
 
-                  {isSoldOut && <Badge variant="secondary">매진</Badge>}
+                  {schedule.isSoldOut && <Badge variant="secondary">매진</Badge>}
                   {isAlmostSoldOut && (
                     <Badge variant="destructive">마감임박</Badge>
+                  )}
+                  {!schedule.isBookingOpen && (
+                    <Badge variant="outline">예매 종료</Badge>
                   )}
                 </div>
               </div>
 
               <Button
                 onClick={() => handleSelectSchedule(schedule.id)}
-                disabled={isSoldOut}
+                disabled={schedule.isSoldOut || !schedule.isBookingOpen}
               >
-                {isSoldOut ? '매진' : '좌석 선택'}
+                {schedule.isSoldOut ? '매진' : schedule.isBookingOpen ? '좌석 선택' : '예매 종료'}
               </Button>
             </CardContent>
           </Card>

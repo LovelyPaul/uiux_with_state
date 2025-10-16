@@ -95,15 +95,18 @@ export default function SeatsPage({ params }: SeatsPageProps) {
     }
 
     try {
-      await createTempReservation.mutateAsync({
+      console.log('Creating temp reservation for seats:', selectedSeats.map((s) => s.seatId));
+      const result = await createTempReservation.mutateAsync({
         seatIds: selectedSeats.map((s) => s.seatId),
       });
+      console.log('Temp reservation result:', result);
 
       toast({
         title: '좌석 임시 예약 완료',
         description: '10분 안에 결제를 완료해주세요.',
       });
     } catch (error) {
+      console.error('Temp reservation failed:', error);
       toast({
         title: '임시 예약 실패',
         description: '이미 예약된 좌석이거나 오류가 발생했습니다.',
@@ -113,7 +116,7 @@ export default function SeatsPage({ params }: SeatsPageProps) {
   };
 
   const handleCancelTempReservation = async () => {
-    if (tempReservationIds.length === 0) return;
+    if (!tempReservationIds || tempReservationIds.length === 0) return;
 
     try {
       await deleteTempReservation.mutateAsync({
@@ -190,7 +193,10 @@ export default function SeatsPage({ params }: SeatsPageProps) {
     );
   }
 
-  const hasReservation = tempReservationIds.length > 0 && expiresAt;
+  const hasReservation = tempReservationIds && tempReservationIds.length > 0 && expiresAt;
+
+  // Debug: store 상태 로깅
+  console.log('Store state:', { tempReservationIds, expiresAt, hasReservation });
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
