@@ -22,11 +22,6 @@ export function ConcertCard({ concert }: ConcertCardProps) {
   const router = useRouter();
   const { toggle, isLoading } = useWishlistToggle();
 
-  const handleWishlistClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    await toggle(concert.id, concert.isWishlisted);
-  };
-
   const handleCardClick = () => {
     router.push(`/concerts/${concert.id}`);
   };
@@ -38,23 +33,10 @@ export function ConcertCard({ concert }: ConcertCardProps) {
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
         <img
-          src={concert.imageUrl || `https://picsum.photos/seed/${concert.id}/800/450`}
+          src={concert.posterUrl || `https://picsum.photos/seed/${concert.id}/800/450`}
           alt={concert.title}
           className="object-cover w-full h-full"
         />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 bg-background/80 hover:bg-background"
-          onClick={handleWishlistClick}
-          disabled={isLoading}
-        >
-          <Heart
-            className={`h-5 w-5 ${
-              concert.isWishlisted ? 'fill-red-500 text-red-500' : ''
-            }`}
-          />
-        </Button>
       </div>
 
       <CardHeader>
@@ -72,17 +54,17 @@ export function ConcertCard({ concert }: ConcertCardProps) {
       <CardContent className="space-y-2">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4" />
-          <span className="line-clamp-1">{concert.venue}</span>
+          <span className="line-clamp-1">{concert.venueName}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span>
-            {format(new Date(concert.startDate), 'yyyy.MM.dd', { locale: ko })}
-            {concert.startDate !== concert.endDate &&
-              ` - ${format(new Date(concert.endDate), 'yyyy.MM.dd', { locale: ko })}`}
-          </span>
-        </div>
+        {concert.nearestDate && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            <span>
+              {format(new Date(concert.nearestDate), 'yyyy.MM.dd (E)', { locale: ko })}
+            </span>
+          </div>
+        )}
 
         {concert.genre && (
           <div className="flex gap-1 flex-wrap">
@@ -95,7 +77,7 @@ export function ConcertCard({ concert }: ConcertCardProps) {
         <div className="text-sm">
           <span className="text-muted-foreground">가격 </span>
           <span className="font-semibold">
-            {concert.minPrice.toLocaleString()}원 ~
+            {concert.minPrice ? `${concert.minPrice.toLocaleString()}원 ~` : '문의'}
           </span>
         </div>
         <Button size="sm" disabled={concert.availableSeats === 0}>

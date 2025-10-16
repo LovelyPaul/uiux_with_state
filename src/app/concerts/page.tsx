@@ -79,7 +79,7 @@ export default function ConcertsPage() {
 
       {!isLoading && data && (
         <>
-          {data.items.length === 0 ? (
+          {data.concerts.length === 0 ? (
             <EmptyState
               icon={Music}
               title="검색 결과가 없습니다"
@@ -88,16 +88,16 @@ export default function ConcertsPage() {
           ) : (
             <>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {data.items.map((concert) => (
+                {data.concerts.map((concert) => (
                   <ConcertCard key={concert.id} concert={concert} />
                 ))}
               </div>
 
-              {data.pagination.totalPages > 1 && (
+              {data.hasMore && (
                 <div className="mt-8">
                   <Pagination
-                    currentPage={data.pagination.currentPage}
-                    totalPages={data.pagination.totalPages}
+                    currentPage={data.page}
+                    totalPages={Math.ceil(data.total / data.limit)}
                     onPageChange={handlePageChange}
                   />
                 </div>
