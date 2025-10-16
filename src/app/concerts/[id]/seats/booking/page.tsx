@@ -120,7 +120,7 @@ export default function BookingPage({ params }: BookingPageProps) {
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">예약자 정보 입력</h1>
         <p className="text-muted-foreground">
-          {concert.title} - {selectedSchedule.concertDate} {selectedSchedule.startTime}
+          {concert.title} - {selectedSchedule.concertDate} {selectedSchedule.concertTime}
         </p>
       </div>
 
