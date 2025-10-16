@@ -119,7 +119,7 @@ export const registerSeatRoutes = (app: Hono<AppEnv>) => {
     for (const seatId of seatIds) {
       const result = await releaseTempReservation(supabase, userId, seatId);
       if (!result.ok) {
-        logger.error('Failed to release temp reservation', { seatId, error: result.error });
+        logger.error('Failed to release temp reservation', { seatId, error: (result as any).error });
         return respond(c, result);
       }
     }
