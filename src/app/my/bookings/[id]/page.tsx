@@ -195,8 +195,8 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
               <div className="text-sm">
                 <span className="text-muted-foreground block mb-1">좌석 번호</span>
                 <div className="flex flex-wrap gap-2">
-                  {booking.seats.map((seat) => (
-                    <Badge key={seat.id} variant="outline">
+                  {booking.seats.map((seat, index) => (
+                    <Badge key={index} variant="outline">
                       {seat.seatNumber}
                     </Badge>
                   ))}
@@ -213,12 +213,12 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
 
             <div className="pl-7 space-y-3">
               <div className="space-y-2">
-                {booking.seats.map((seat) => (
-                  <div key={seat.id} className="flex justify-between text-sm">
+                {booking.seats.map((seat, index) => (
+                  <div key={index} className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
-                      {seat.seatNumber} ({seat.grade})
+                      {seat.seatNumber} ({seat.seatGrade})
                     </span>
-                    <span>{seat.price.toLocaleString()}원</span>
+                    <span>{seat.price?.toLocaleString()}원</span>
                   </div>
                 ))}
               </div>
