@@ -82,7 +82,7 @@ export function ConcertFilter({
   };
 
   const handleSortChange = (value: string) => {
-    setSortBy(value);
+    setSortBy(value as 'latest' | 'popularity' | 'price');
     onFilterChange({
       search: debouncedSearch || undefined,
       genre: genre === 'all' ? undefined : genre,
