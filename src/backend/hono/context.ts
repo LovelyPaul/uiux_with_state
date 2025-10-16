@@ -14,6 +14,7 @@ export type AppVariables = {
   supabase: SupabaseClient;
   logger: AppLogger;
   config: AppConfig;
+  userId?: string;
 };
 
 export type AppEnv = {
