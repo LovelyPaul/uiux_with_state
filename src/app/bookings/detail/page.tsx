@@ -74,16 +74,11 @@ export default function BookingDetailPage() {
         password: password,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || '예약 조회 실패');
-      }
-
-      const data = await response.json();
-      setBooking(data);
+      setBooking(response.data);
       setIsLoading(false);
     } catch (err: any) {
-      setError(err.message || '예약 정보를 찾을 수 없거나 입력 정보가 올바르지 않습니다.');
+      const errorMessage = err.response?.data?.error?.message || err.message || '예약 정보를 찾을 수 없거나 입력 정보가 올바르지 않습니다.';
+      setError(errorMessage);
       setIsLoading(false);
     }
   };
@@ -96,15 +91,10 @@ export default function BookingDetailPage() {
     }
 
     try {
-      const response = await apiClient.post('/api/bookings/guest/cancel', {
+      await apiClient.post('/api/bookings/guest/cancel', {
         phoneNumber: phone,
         password: password,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || '예약 취소 실패');
-      }
 
       toast({
         title: '예약 취소 완료',
@@ -113,9 +103,10 @@ export default function BookingDetailPage() {
 
       fetchBookingDetail();
     } catch (error: any) {
+      const errorMessage = error.response?.data?.error?.message || error.message || '예약 취소 중 오류가 발생했습니다.';
       toast({
         title: '예약 취소 실패',
-        description: error.message || '예약 취소 중 오류가 발생했습니다.',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
