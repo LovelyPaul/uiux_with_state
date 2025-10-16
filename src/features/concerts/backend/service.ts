@@ -240,11 +240,11 @@ export async function getConcertDetail(
       runningTime: concert.running_time,
       status: concert.status,
       venue: {
-        id: concert.venues.id,
-        name: concert.venues.name,
-        address: concert.venues.address,
-        locationLat: concert.venues.location_lat,
-        locationLng: concert.venues.location_lng,
+        id: (concert.venues as any).id,
+        name: (concert.venues as any).name,
+        address: (concert.venues as any).address,
+        locationLat: (concert.venues as any).location_lat,
+        locationLng: (concert.venues as any).location_lng,
       },
       schedules: schedules?.map(s => ({
         id: s.id,
