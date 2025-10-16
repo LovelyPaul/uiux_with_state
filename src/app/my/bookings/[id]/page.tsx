@@ -189,7 +189,7 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
             <div className="pl-7 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">좌석 수</span>
-                <span className="font-medium">{booking.seatCount}석</span>
+                <span className="font-medium">{booking.seats.length}석</span>
               </div>
 
               <div className="text-sm">
