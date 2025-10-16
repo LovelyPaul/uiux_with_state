@@ -101,19 +101,32 @@ export async function getConcertList(
     // Get schedules and seats for each concert
     const concertIds = data.map((c: any) => c.id);
 
-    const { data: schedules } = await supabase
-      .from('concert_schedules')
-      .select('id, concert_id, concert_date')
-      .in('concert_id', concertIds)
-      .eq('is_booking_open', true)
-      .eq('is_sold_out', false)
-      .order('concert_date', { ascending: true });
+    let schedules = null;
+    let seats = null;
 
-    const scheduleIds = schedules?.map(s => s.id) || [];
-    const { data: seats } = await supabase
-      .from('seats')
-      .select('concert_schedule_id, price, status')
-      .in('concert_schedule_id', scheduleIds);
+    // Only query if we have concerts
+    if (concertIds.length > 0) {
+      const schedulesResult = await supabase
+        .from('concert_schedules')
+        .select('id, concert_id, concert_date')
+        .in('concert_id', concertIds)
+        .eq('is_booking_open', true)
+        .eq('is_sold_out', false)
+        .order('concert_date', { ascending: true });
+
+      schedules = schedulesResult.data;
+
+      const scheduleIds = schedules?.map(s => s.id) || [];
+
+      if (scheduleIds.length > 0) {
+        const seatsResult = await supabase
+          .from('seats')
+          .select('concert_schedule_id, price, status')
+          .in('concert_schedule_id', scheduleIds);
+
+        seats = seatsResult.data;
+      }
+    }
 
     const concerts: ConcertItem[] = data.map((row: any) => {
       const concertSchedules = schedules?.filter(s => s.concert_id === row.id) || [];
@@ -128,14 +141,17 @@ export async function getConcertList(
       const prices = concertSeats.map(s => s.price).filter(p => p != null);
       const minPrice = prices.length > 0 ? Math.min(...prices) : null;
 
+      // venues can be an array or object depending on Supabase query
+      const venue = Array.isArray(row.venues) ? row.venues[0] : row.venues;
+
       return {
         id: row.id,
         title: row.title,
         posterUrl: row.poster_url,
         genre: row.genre,
         performers: row.performers,
-        venueName: row.venues.name,
-        venueAddress: row.venues.address,
+        venueName: venue?.name || '',
+        venueAddress: venue?.address || '',
         nearestDate,
         minPrice,
         availableSeats: availableSeatsCount,
@@ -153,7 +169,9 @@ export async function getConcertList(
       hasMore,
     });
   } catch (error) {
-    return failure(500, concertErrorCodes.DATABASE_ERROR, '콘서트 목록 조회 중 오류가 발생했습니다.', { error });
+    console.error('[getConcertList] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : '콘서트 목록 조회 중 오류가 발생했습니다.';
+    return failure(500, concertErrorCodes.DATABASE_ERROR, errorMessage, { error });
   }
 }
 
