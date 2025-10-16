@@ -7,15 +7,9 @@ import { Calendar, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useRouter } from 'next/navigation';
+import type { ConcertDetail } from '@/features/concerts/lib/dto';
 
-interface Schedule {
-  id: string;
-  concertDate: string;
-  concertTime: string;
-  availableSeats: number;
-  isSoldOut: boolean;
-  isBookingOpen: boolean;
-}
+type Schedule = ConcertDetail['schedules'][number];
 
 interface ConcertScheduleListProps {
   schedules: Schedule[];
