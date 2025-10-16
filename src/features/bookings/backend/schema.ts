@@ -4,6 +4,9 @@ import { z } from 'zod';
 
 export const CreateBookingRequestSchema = z.object({
   scheduleId: z.string().uuid(),
+  name: z.string().min(2),
+  phoneNumber: z.string().regex(/^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/),
+  password: z.string().min(4),
 });
 
 export type CreateBookingRequest = z.infer<typeof CreateBookingRequestSchema>;

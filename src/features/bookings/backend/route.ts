@@ -45,10 +45,10 @@ export const registerBookingRoutes = (app: Hono<AppEnv>) => {
       );
     }
 
-    const { scheduleId } = bodyParseResult.data;
-    logger.info('Creating booking', { userId, scheduleId });
+    const { scheduleId, name, phoneNumber, password } = bodyParseResult.data;
+    logger.info('Creating booking', { userId, scheduleId, name, phoneNumber });
 
-    const result = await createBooking(supabase, userId, scheduleId);
+    const result = await createBooking(supabase, userId, scheduleId, name, phoneNumber, password);
     return respond(c, result);
   });
 

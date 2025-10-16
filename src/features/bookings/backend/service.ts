@@ -20,11 +20,21 @@ import {
 export async function createBooking(
   supabase: SupabaseClient,
   userId: string,
-  scheduleId: string
+  scheduleId: string,
+  guestName: string,
+  guestPhone: string,
+  guestPassword: string
 ): Promise<HandlerResult<CreateBookingResponse, BookingServiceError, unknown>> {
   try {
+    // 간단한 비밀번호 해싱 (SHA-256 사용)
+    const encoder = new TextEncoder();
+    const data = encoder.encode(guestPassword);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
     // Call Supabase RPC function for atomic transaction
-    const { data, error } = await supabase.rpc('create_booking_transaction', {
+    const { data: rpcData, error } = await supabase.rpc('create_booking_transaction', {
       p_user_id: userId,
       p_schedule_id: scheduleId,
     });
@@ -36,9 +46,23 @@ export async function createBooking(
       return failure(500, bookingErrorCodes.DATABASE_ERROR, error.message, { originalError: error });
     }
 
+    // 예약자 정보 업데이트
+    const { error: updateError } = await supabase
+      .from('bookings')
+      .update({
+        guest_name: guestName,
+        guest_phone: guestPhone,
+        guest_password_hash: passwordHash,
+      })
+      .eq('id', rpcData.booking_id);
+
+    if (updateError) {
+      return failure(500, bookingErrorCodes.DATABASE_ERROR, updateError.message, { originalError: updateError });
+    }
+
     return success({
-      bookingId: data.booking_id,
-      bookingNumber: data.booking_number,
+      bookingId: rpcData.booking_id,
+      bookingNumber: rpcData.booking_number,
     });
   } catch (error) {
     return failure(500, bookingErrorCodes.DATABASE_ERROR, '예약 생성 중 오류가 발생했습니다.', { error });
