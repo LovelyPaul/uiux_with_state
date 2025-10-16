@@ -241,7 +241,7 @@ export async function getBookingDetail(
       .select('seats!inner(seat_number, seat_grade, price)')
       .eq('booking_id', bookingId);
 
-    const concertDate = new Date(data.concert_schedules.concert_date);
+    const concertDate = new Date((data.concert_schedules as any).concert_date);
     const now = new Date();
     const isCancellable =
       data.status === 'confirmed' &&
@@ -256,19 +256,19 @@ export async function getBookingDetail(
       cancelledAt: data.cancelled_at,
       cancellationReason: data.cancellation_reason,
       concert: {
-        title: data.concert_schedules.concerts.title,
-        posterUrl: data.concert_schedules.concerts.poster_url,
-        performers: data.concert_schedules.concerts.performers,
+        title: (data.concert_schedules as any).concerts.title,
+        posterUrl: (data.concert_schedules as any).concerts.poster_url,
+        performers: (data.concert_schedules as any).concerts.performers,
       },
       schedule: {
-        concertDate: data.concert_schedules.concert_date,
-        concertTime: data.concert_schedules.concert_time,
+        concertDate: (data.concert_schedules as any).concert_date,
+        concertTime: (data.concert_schedules as any).concert_time,
       },
       venue: {
-        name: data.concert_schedules.concerts.venues.name,
-        address: data.concert_schedules.concerts.venues.address,
-        locationLat: data.concert_schedules.concerts.venues.location_lat,
-        locationLng: data.concert_schedules.concerts.venues.location_lng,
+        name: (data.concert_schedules as any).concerts.venues.name,
+        address: (data.concert_schedules as any).concerts.venues.address,
+        locationLat: (data.concert_schedules as any).concerts.venues.location_lat,
+        locationLng: (data.concert_schedules as any).concerts.venues.location_lng,
       },
       seats: (bookingSeats || []).map((bs: any) => ({
         seatNumber: bs.seats.seat_number,
@@ -367,7 +367,7 @@ export async function getGuestBookingDetail(
       .select('seats!inner(seat_number, seat_grade, price)')
       .eq('booking_id', bookingData.id);
 
-    const concertDate = new Date(bookingData.concert_schedules.concert_date);
+    const concertDate = new Date((bookingData.concert_schedules as any).concert_date);
     const now = new Date();
     const isCancellable =
       bookingData.status === 'confirmed' &&
@@ -384,19 +384,19 @@ export async function getGuestBookingDetail(
       guestName: bookingData.guest_name,
       guestPhone: bookingData.guest_phone,
       concert: {
-        title: bookingData.concert_schedules.concerts.title,
-        posterUrl: bookingData.concert_schedules.concerts.poster_url,
-        performers: bookingData.concert_schedules.concerts.performers,
+        title: (bookingData.concert_schedules as any).concerts.title,
+        posterUrl: (bookingData.concert_schedules as any).concerts.poster_url,
+        performers: (bookingData.concert_schedules as any).concerts.performers,
       },
       schedule: {
-        concertDate: bookingData.concert_schedules.concert_date,
-        concertTime: bookingData.concert_schedules.concert_time,
+        concertDate: (bookingData.concert_schedules as any).concert_date,
+        concertTime: (bookingData.concert_schedules as any).concert_time,
       },
       venue: {
-        name: bookingData.concert_schedules.concerts.venues.name,
-        address: bookingData.concert_schedules.concerts.venues.address,
-        locationLat: bookingData.concert_schedules.concerts.venues.location_lat,
-        locationLng: bookingData.concert_schedules.concerts.venues.location_lng,
+        name: (bookingData.concert_schedules as any).concerts.venues.name,
+        address: (bookingData.concert_schedules as any).concerts.venues.address,
+        locationLat: (bookingData.concert_schedules as any).concerts.venues.location_lat,
+        locationLng: (bookingData.concert_schedules as any).concerts.venues.location_lng,
       },
       seats: (bookingSeats || []).map((bs: any) => ({
         seatNumber: bs.seats.seat_number,
